@@ -9,6 +9,17 @@
 @interface UIImageView (Private)
 @end
 
+@interface UIView (FindUIViewController)
+- (UIViewController *) firstAvailableViewController;
+- (id) traverseResponderChainForViewController;
+@end
+
+@interface UIScrollView (Private)
+@end
+
+@interface UICollectionViewCell (Private)
+@end
+
 @interface CALayer (Private)
 @property (nonatomic, assign) BOOL continuousCorners;
 @end
@@ -19,9 +30,10 @@
 @property(nonatomic) UIEdgeInsets sectionInset;
 @property (nonatomic) CGFloat minimumLineSpacing;
 @property (nonatomic) CGFloat minimumInteritemSpacing;
+@property (nonatomic, assign) CGSize itemSize;
 @end
 
-@interface _TtCC16MusicApplication9AlbumCell : UIView
+@interface _TtCC16MusicApplication9AlbumCell : UICollectionViewCell
 @end
 
 @interface _TtCC16MusicApplication27VerticalStackViewController10ScrollView : UIScrollView

@@ -155,11 +155,5 @@
 
 }
 
-- (void)dopeConvos:(id)sender {
-
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://repo.twickd.com/package/com.twickd.ethan-whited.dopeconvos"]];
-
-}
-
 
 @end

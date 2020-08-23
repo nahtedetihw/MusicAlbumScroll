@@ -1,9 +1,10 @@
 Package: com.nahtedetihw.musicalbumscroll
 Name: MusicAlbumScroll
 Depends: mobilesubstrate, ws.hbang.common
-Version: 1.4
 Architecture: iphoneos-arm
 Description: Scroll recently added songs horizontally!
 Maintainer: Ethan Whited
 Author: Ethan Whited
 Section: Tweaks
+Version: 1.4
+Installed-Size: 432
