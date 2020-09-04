@@ -10,8 +10,13 @@
 @end
 
 @interface UIView (FindUIViewController)
+@property (nonatomic, assign, getter=isPlaying) BOOL playing;
 - (UIViewController *) firstAvailableViewController;
 - (id) traverseResponderChainForViewController;
+@end
+
+@interface UIButton (Private)
+@property (nonatomic, assign, getter=isPlaying) BOOL playing;
 @end
 
 @interface UIScrollView (Private)
@@ -37,4 +42,21 @@
 @end
 
 @interface _TtCC16MusicApplication27VerticalStackViewController10ScrollView : UIScrollView
+@end
+
+@interface SPTNowPlayingPlayButtonV2 : UIButton
+@property (nonatomic, assign, getter=isPlaying) BOOL playing;
+@property (nonatomic, strong) UIColor *fillColor;
+@end
+
+@interface SPTNowPlayingNextTrackButton : UIButton
+@property (nonatomic, strong) UIColor *iconColor;
+@end
+
+@interface SPTNowPlayingPreviousTrackButton : UIButton
+@property (nonatomic, strong) UIColor *iconColor;
+@end
+
+@interface SPTNowPlayingPlayPauseButtonViewController : UIViewController
+-(void)updatePlayPauseButton;
 @end

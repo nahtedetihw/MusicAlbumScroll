@@ -1,10 +1,10 @@
-Package: com.nahtedetihw.musicalbumscroll
-Name: MusicAlbumScroll
+Package: com.nahtedetihw.spotifyui
+Name: SpotifyUI
 Depends: mobilesubstrate, ws.hbang.common
 Architecture: iphoneos-arm
-Description: Scroll recently added songs horizontally!
+Description: Allows UI Theming for Spotify!
 Maintainer: Ethan Whited
 Author: Ethan Whited
 Section: Tweaks
-Version: 1.4
-Installed-Size: 432
+Version: 1.0
+Installed-Size: 448

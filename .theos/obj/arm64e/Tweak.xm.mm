@@ -3,34 +3,28 @@
 #import <AudioToolbox/AudioServices.h>
 
 BOOL enabled;
-BOOL enableInNowPlaying;
 HBPreferences *preferences;
-static double horizontalSpacing;
-static double verticalSpacing;
-static double albumHeight;
-static double albumWidth;
-BOOL enableRoundedArtwork;
-BOOL disableVerticalScrolling;
-BOOL enableHorizontalScrolling;
-BOOL enableUnlimitedRecentlyAdded;
-UIImageView *musicImageView;
+UIImageView *playingImageView;
+UIImageView *pausedImageView;
 
-@implementation UIView (FindUIViewController)
-- (UIViewController *) firstAvailableViewController {
-    
-    return (UIViewController *)[self traverseResponderChainForViewController];
+@implementation UIImage (Resize)
+
+- (UIImage*)scaleToSize:(CGSize)size {
+UIGraphicsBeginImageContext(size);
+
+CGContextRef context = UIGraphicsGetCurrentContext();
+CGContextTranslateCTM(context, 0.0, size.height);
+CGContextScaleCTM(context, 1.0, -1.0);
+
+CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, size.width, size.height), self.CGImage);
+
+UIImage* scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+
+UIGraphicsEndImageContext();
+
+return scaledImage;
 }
 
-- (id) traverseResponderChainForViewController {
-    id nextResponder = [self nextResponder];
-    if ([nextResponder isKindOfClass:[UIViewController class]]) {
-        return nextResponder;
-    } else if ([nextResponder isKindOfClass:[UIView class]]) {
-        return [nextResponder traverseResponderChainForViewController];
-    } else {
-        return nil;
-    }
-}
 @end
 
 
@@ -54,139 +48,100 @@ UIImageView *musicImageView;
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class MusicRecentlyAdded; @class UIImageView; @class UICollectionView; @class MPModelLibraryRequest; @class MusicNowPlayingContentView; @class UIScrollView; 
+@class SPTNowPlayingNextTrackButton; @class SPTNowPlayingPreviousTrackButton; @class SPTNowPlayingPlayButtonV2; 
 
 
-#line 35 "Tweak.xm"
-static void (*_logos_orig$MusicAlbumScroll$UICollectionView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL UICollectionView* _LOGOS_SELF_CONST, SEL); static void _logos_method$MusicAlbumScroll$UICollectionView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL UICollectionView* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$MusicAlbumScroll$MPModelLibraryRequest$setContentRange$)(_LOGOS_SELF_TYPE_NORMAL MPModelLibraryRequest* _LOGOS_SELF_CONST, SEL, NSRange); static void _logos_method$MusicAlbumScroll$MPModelLibraryRequest$setContentRange$(_LOGOS_SELF_TYPE_NORMAL MPModelLibraryRequest* _LOGOS_SELF_CONST, SEL, NSRange); static void (*_logos_orig$MusicAlbumScroll$MusicNowPlayingContentView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void _logos_method$MusicAlbumScroll$MusicNowPlayingContentView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void _logos_method$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL UIImageView* _LOGOS_SELF_CONST, SEL); static void _logos_method$MusicAlbumScroll$UIImageView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL UIImageView* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$MusicAlbumScroll$UIScrollView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL UIScrollView* _LOGOS_SELF_CONST, SEL); static void _logos_method$MusicAlbumScroll$UIScrollView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL UIScrollView* _LOGOS_SELF_CONST, SEL); 
+#line 29 "Tweak.xm"
+static CGSize (*_logos_orig$SpotifyUI$SPTNowPlayingPlayButtonV2$circleSize)(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPlayButtonV2* _LOGOS_SELF_CONST, SEL); static CGSize _logos_method$SpotifyUI$SPTNowPlayingPlayButtonV2$circleSize(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPlayButtonV2* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$SpotifyUI$SPTNowPlayingPlayButtonV2$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPlayButtonV2* _LOGOS_SELF_CONST, SEL); static void _logos_method$SpotifyUI$SPTNowPlayingPlayButtonV2$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPlayButtonV2* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$SpotifyUI$SPTNowPlayingNextTrackButton$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingNextTrackButton* _LOGOS_SELF_CONST, SEL); static void _logos_method$SpotifyUI$SPTNowPlayingNextTrackButton$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingNextTrackButton* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$SpotifyUI$SPTNowPlayingPreviousTrackButton$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPreviousTrackButton* _LOGOS_SELF_CONST, SEL); static void _logos_method$SpotifyUI$SPTNowPlayingPreviousTrackButton$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPreviousTrackButton* _LOGOS_SELF_CONST, SEL); 
 
 
 
-static void _logos_method$MusicAlbumScroll$UICollectionView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL UICollectionView* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
-if (enableHorizontalScrolling) {
-    _logos_orig$MusicAlbumScroll$UICollectionView$layoutSubviews(self, _cmd);
 
-    UICollectionView *collectionview = (UICollectionView *)self;
-    if([NSStringFromClass([((UICollectionView *)self).dataSource class]) isEqualToString:@"MusicApplication.LibraryRecentlyAddedViewController"]) {
-    _logos_orig$MusicAlbumScroll$UICollectionView$layoutSubviews(self, _cmd);
-    collectionview.collectionViewLayout.scrollDirection = 1;
-    collectionview.collectionViewLayout.sectionInset = UIEdgeInsetsMake(0,-314,0,0);
-    collectionview.collectionViewLayout.itemSize = CGSizeMake(albumHeight, albumWidth);
-    collectionview.collectionViewLayout.minimumLineSpacing = horizontalSpacing;
-    collectionview.collectionViewLayout.minimumInteritemSpacing = verticalSpacing;
-    collectionview.clipsToBounds = NO;
-}
-_logos_orig$MusicAlbumScroll$UICollectionView$layoutSubviews(self, _cmd);
-}
-_logos_orig$MusicAlbumScroll$UICollectionView$layoutSubviews(self, _cmd);
+static CGSize _logos_method$SpotifyUI$SPTNowPlayingPlayButtonV2$circleSize(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPlayButtonV2* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
+    return CGSizeMake(0, 0);
 }
 
 
-
-
-
-static void _logos_method$MusicAlbumScroll$MPModelLibraryRequest$setContentRange$(_LOGOS_SELF_TYPE_NORMAL MPModelLibraryRequest* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, NSRange range) {
-if (enableUnlimitedRecentlyAdded) {
-    range.length = 9000 * 900;
-    _logos_orig$MusicAlbumScroll$MPModelLibraryRequest$setContentRange$(self, _cmd, range);
-}
-_logos_orig$MusicAlbumScroll$MPModelLibraryRequest$setContentRange$(self, _cmd, range);
-}
-
-
-
-
-
-static void _logos_method$MusicAlbumScroll$MusicNowPlayingContentView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
-_logos_orig$MusicAlbumScroll$MusicNowPlayingContentView$layoutSubviews(self, _cmd);
-[((UIView *)self).layer setShadowOpacity:0];
-}
-
-
-
-
-static void _logos_method$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
-if (enableHorizontalScrolling) {
-_logos_orig$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews(self, _cmd);
-    UIView *titleview = (UIView *)self;
-    if([NSStringFromClass([((UIView *)self) class]) isEqualToString:@"MusicApplication.TitleSectionHeaderView"] && [NSStringFromClass([((UIView *)self).firstAvailableViewController class]) isEqualToString:@"MusicApplication.LibraryRecentlyAddedViewController"]) {
-    titleview.hidden = YES;
-}
-_logos_orig$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews(self, _cmd);
-}
-_logos_orig$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews(self, _cmd);
+static void _logos_method$SpotifyUI$SPTNowPlayingPlayButtonV2$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPlayButtonV2* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
+    if (!self.isPlaying) {
+    UIImage *playingImage = [UIImage systemImageNamed:@"play.circle.fill"];
+    for (UIImageView *subview in [((UIButton *)self) subviews]) {
+    if([subview isEqual:[[((UIButton *)self) subviews] objectAtIndex:0]]) {
+    subview.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    }
+    [self setBackgroundImage:playingImage forState:UIControlStateNormal];
+    self.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
+    self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
+    self.tintColor = self.fillColor;
+    } else {
+    UIImage *pausedImage = [UIImage systemImageNamed:@"pause.circle.fill"];
+    for (UIImageView *subview in [((UIButton *)self) subviews]) {
+    if([subview isEqual:[[((UIButton *)self) subviews] objectAtIndex:0]]) {
+    subview.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    }
+    [self setBackgroundImage:pausedImage forState:UIControlStateNormal];
+    self.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
+    self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
+    self.tintColor = self.fillColor;
+    }
+    _logos_orig$SpotifyUI$SPTNowPlayingPlayButtonV2$layoutSubviews(self, _cmd);
 }
 
 
 
 
 
-static void _logos_method$MusicAlbumScroll$UIImageView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL UIImageView* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
-if (enableRoundedArtwork) {
-if (enableInNowPlaying) {
-_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews(self, _cmd);
-if([self isKindOfClass:[UIImageView class]] && [NSStringFromClass([self class]) isEqualToString:@"MusicApplication.ArtworkComponentImageView"] && ![NSStringFromClass([self.superview class]) isEqualToString:@"MusicApplication.PromotionalParallaxContentView"] && ![NSStringFromClass([self.superview.superview class]) isEqualToString:@"MusicApplication.FeaturedMusicVideoVerticalCell"] && ![NSStringFromClass([self.superview.superview class]) isEqualToString:@"MusicApplication.MusicVideoVerticalCell"]) {
-UIImage *musicImage = [UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/musicalbumscrollprefs.bundle/mask.png"];
-musicImageView = [[UIImageView alloc] initWithImage:musicImage];
-musicImageView.frame = self.bounds;
-self.maskView = musicImageView;
-self.layer.masksToBounds = YES;
-self.layer.shadowOpacity = 0.0;
-self.layer.borderWidth = 0;
-}
-_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews(self, _cmd);
-} else {
-_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews(self, _cmd);
-if([self isKindOfClass:[UIImageView class]] && [NSStringFromClass([self class]) isEqualToString:@"MusicApplication.ArtworkComponentImageView"] && ![NSStringFromClass([self.superview class]) isEqualToString:@"MusicApplication.NowPlayingContentView"] && ![NSStringFromClass([self.superview class]) isEqualToString:@"MusicApplication.PromotionalParallaxContentView"] && ![NSStringFromClass([self.superview.superview class]) isEqualToString:@"MusicApplication.FeaturedMusicVideoVerticalCell"] && ![NSStringFromClass([self.superview.superview class]) isEqualToString:@"MusicApplication.MusicVideoVerticalCell"]) {
-UIImage *musicImage = [UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/musicalbumscrollprefs.bundle/mask.png"];
-musicImageView = [[UIImageView alloc] initWithImage:musicImage];
-musicImageView.frame = self.bounds;
-self.maskView = musicImageView;
-self.layer.masksToBounds = YES;
-self.layer.shadowOpacity = 0.0;
-self.layer.borderWidth = 0;
-}
-_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews(self, _cmd);
-}
-_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews(self, _cmd);
-}
-_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews(self, _cmd);
-}
 
-
-
-static void _logos_method$MusicAlbumScroll$UIScrollView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL UIScrollView* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
-if([NSStringFromClass([((UIScrollView *)self) class]) isEqualToString:@"_TtCC16MusicApplication27VerticalStackViewController10ScrollView"] && [NSStringFromClass([((_TtCC16MusicApplication27VerticalStackViewController10ScrollView *)self).firstAvailableViewController class]) isEqualToString:@"MusicApplication.LibraryViewController"]) {
-_logos_orig$MusicAlbumScroll$UIScrollView$layoutSubviews(self, _cmd);
-self.contentInset = UIEdgeInsetsMake(0,0,0,0);
-if (disableVerticalScrolling) {
-self.scrollEnabled = NO;
-}
-_logos_orig$MusicAlbumScroll$UIScrollView$layoutSubviews(self, _cmd);
-}
-_logos_orig$MusicAlbumScroll$UIScrollView$layoutSubviews(self, _cmd);
+static void _logos_method$SpotifyUI$SPTNowPlayingNextTrackButton$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingNextTrackButton* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
+    _logos_orig$SpotifyUI$SPTNowPlayingNextTrackButton$layoutSubviews(self, _cmd);
+    UIImage *nextImage = [UIImage systemImageNamed:@"forward.end.fill"];
+    UIImage *blankImage = [[UIImage alloc] init];
+    for (UIImageView *subview in [((UIButton *)self) subviews]) {
+    if([subview isEqual:[[((UIButton *)self) subviews] objectAtIndex:0]]) {
+    subview.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    }
+    [self setImage:blankImage forState:UIControlStateNormal];
+    [self setBackgroundImage:nextImage forState:UIControlStateNormal];
 }
 
 
 
 
-static __attribute__((constructor)) void _logosLocalCtor_d0f2e29d(int __unused argc, char __unused **argv, char __unused **envp) {
 
-    preferences = [[HBPreferences alloc] initWithIdentifier:@"com.nahtedetihw.musicalbumscrollprefs"];
+
+static void _logos_method$SpotifyUI$SPTNowPlayingPreviousTrackButton$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL SPTNowPlayingPreviousTrackButton* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
+    _logos_orig$SpotifyUI$SPTNowPlayingPreviousTrackButton$layoutSubviews(self, _cmd);
+    UIImage *previousImage = [UIImage systemImageNamed:@"backward.end.fill"];
+    UIImage *blankImage = [[UIImage alloc] init];
+    for (UIImageView *subview in [((UIButton *)self) subviews]) {
+    if([subview isEqual:[[((UIButton *)self) subviews] objectAtIndex:0]]) {
+    subview.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    }
+    [self setImage:blankImage forState:UIControlStateNormal];
+    UIImage* newPreviousImage = [previousImage scaleToSize:CGSizeMake(50.0f,50.0f)];
+    [self setBackgroundImage:newPreviousImage forState:UIControlStateNormal];
+    self.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
+    self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
+    self.tintColor = self.iconColor;
+}
+
+
+
+
+
+
+static __attribute__((constructor)) void _logosLocalCtor_7fe63bfc(int __unused argc, char __unused **argv, char __unused **envp) {
+
+    preferences = [[HBPreferences alloc] initWithIdentifier:@"com.nahtedetihw.spotifyuiprefs"];
     [preferences registerBool:&enabled default:NO forKey:@"enabled"];
-    [preferences registerDouble:&horizontalSpacing default:10 forKey:@"horizontalSpacing"];
-    [preferences registerDouble:&verticalSpacing default:12 forKey:@"verticalSpacing"];
-    [preferences registerDouble:&albumHeight default:150 forKey:@"albumHeight"];
-    [preferences registerDouble:&albumWidth default:190 forKey:@"albumWidth"];
-    [preferences registerBool:&enableRoundedArtwork default:NO forKey:@"enableRoundedArtwork"];
-    [preferences registerBool:&disableVerticalScrolling default:NO forKey:@"disableVerticalScrolling"];
-    [preferences registerBool:&enableHorizontalScrolling default:NO forKey:@"enableHorizontalScrolling"];
-    [preferences registerBool:&enableUnlimitedRecentlyAdded default:NO forKey:@"enableUnlimitedRecentlyAdded"];
-    [preferences registerBool:&enableInNowPlaying default:NO forKey:@"enableInNowPlaying"];
     
     
     if (enabled) {
-    {Class _logos_class$MusicAlbumScroll$UICollectionView = objc_getClass("UICollectionView"); { MSHookMessageEx(_logos_class$MusicAlbumScroll$UICollectionView, @selector(layoutSubviews), (IMP)&_logos_method$MusicAlbumScroll$UICollectionView$layoutSubviews, (IMP*)&_logos_orig$MusicAlbumScroll$UICollectionView$layoutSubviews);}Class _logos_class$MusicAlbumScroll$MPModelLibraryRequest = objc_getClass("MPModelLibraryRequest"); { MSHookMessageEx(_logos_class$MusicAlbumScroll$MPModelLibraryRequest, @selector(setContentRange:), (IMP)&_logos_method$MusicAlbumScroll$MPModelLibraryRequest$setContentRange$, (IMP*)&_logos_orig$MusicAlbumScroll$MPModelLibraryRequest$setContentRange$);}Class _logos_class$MusicAlbumScroll$MusicNowPlayingContentView = NSClassFromString(@"MusicApplication.NowPlayingContentView"); { MSHookMessageEx(_logos_class$MusicAlbumScroll$MusicNowPlayingContentView, @selector(layoutSubviews), (IMP)&_logos_method$MusicAlbumScroll$MusicNowPlayingContentView$layoutSubviews, (IMP*)&_logos_orig$MusicAlbumScroll$MusicNowPlayingContentView$layoutSubviews);}Class _logos_class$MusicAlbumScroll$MusicRecentlyAdded = NSClassFromString(@"MusicApplication.TitleSectionHeaderView"); { MSHookMessageEx(_logos_class$MusicAlbumScroll$MusicRecentlyAdded, @selector(layoutSubviews), (IMP)&_logos_method$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews, (IMP*)&_logos_orig$MusicAlbumScroll$MusicRecentlyAdded$layoutSubviews);}Class _logos_class$MusicAlbumScroll$UIImageView = objc_getClass("UIImageView"); { MSHookMessageEx(_logos_class$MusicAlbumScroll$UIImageView, @selector(layoutSubviews), (IMP)&_logos_method$MusicAlbumScroll$UIImageView$layoutSubviews, (IMP*)&_logos_orig$MusicAlbumScroll$UIImageView$layoutSubviews);}Class _logos_class$MusicAlbumScroll$UIScrollView = objc_getClass("UIScrollView"); { MSHookMessageEx(_logos_class$MusicAlbumScroll$UIScrollView, @selector(layoutSubviews), (IMP)&_logos_method$MusicAlbumScroll$UIScrollView$layoutSubviews, (IMP*)&_logos_orig$MusicAlbumScroll$UIScrollView$layoutSubviews);}}
+    {Class _logos_class$SpotifyUI$SPTNowPlayingPlayButtonV2 = objc_getClass("SPTNowPlayingPlayButtonV2"); { MSHookMessageEx(_logos_class$SpotifyUI$SPTNowPlayingPlayButtonV2, @selector(circleSize), (IMP)&_logos_method$SpotifyUI$SPTNowPlayingPlayButtonV2$circleSize, (IMP*)&_logos_orig$SpotifyUI$SPTNowPlayingPlayButtonV2$circleSize);}{ MSHookMessageEx(_logos_class$SpotifyUI$SPTNowPlayingPlayButtonV2, @selector(layoutSubviews), (IMP)&_logos_method$SpotifyUI$SPTNowPlayingPlayButtonV2$layoutSubviews, (IMP*)&_logos_orig$SpotifyUI$SPTNowPlayingPlayButtonV2$layoutSubviews);}Class _logos_class$SpotifyUI$SPTNowPlayingNextTrackButton = objc_getClass("SPTNowPlayingNextTrackButton"); { MSHookMessageEx(_logos_class$SpotifyUI$SPTNowPlayingNextTrackButton, @selector(layoutSubviews), (IMP)&_logos_method$SpotifyUI$SPTNowPlayingNextTrackButton$layoutSubviews, (IMP*)&_logos_orig$SpotifyUI$SPTNowPlayingNextTrackButton$layoutSubviews);}Class _logos_class$SpotifyUI$SPTNowPlayingPreviousTrackButton = objc_getClass("SPTNowPlayingPreviousTrackButton"); { MSHookMessageEx(_logos_class$SpotifyUI$SPTNowPlayingPreviousTrackButton, @selector(layoutSubviews), (IMP)&_logos_method$SpotifyUI$SPTNowPlayingPreviousTrackButton$layoutSubviews, (IMP*)&_logos_orig$SpotifyUI$SPTNowPlayingPreviousTrackButton$layoutSubviews);}}
     
     return;
     

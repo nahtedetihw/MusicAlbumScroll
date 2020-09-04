@@ -8,7 +8,7 @@ FINALPACKAGE = 1
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = MusicAlbumScroll
+TWEAK_NAME = SpotifyUI
 $(TWEAK_NAME)_FILES = Tweak.xm
 $(TWEAK_NAME)_EXTRA_FRAMEWORKS += Cephei
 
@@ -16,6 +16,6 @@ include $(THEOS_MAKE_PATH)/tweak.mk
 
 after-install::
 	install.exec "killall -9 Music && killall -9 Preferences"
-SUBPROJECTS += musicalbumscrollprefs
+SUBPROJECTS += spotifyuiprefs
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
